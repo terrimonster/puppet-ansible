@@ -1,0 +1,5 @@
+- name: Install puppet
+  shell: curl -k https://{{ puppetserver }}:8140/packages/current/install.bash  | bash creates=/etc/puppetlabs/puppet/puppet.conf
+
+- name: Run puppet
+  command: puppet agent -t

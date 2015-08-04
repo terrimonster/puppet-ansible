@@ -1,0 +1,25 @@
+- name: Get proper PE package
+  get_url: url=https://s3.amazonaws.com/pe-builds/released/{{ pe_ver }}/puppet-enterprise-{{ pe_ver }}-{{ pe_arch }}.tar.gz dest=/root/ force=no
+
+- name: Extract the package
+  command: tar -zxvf /root/puppet-enterprise-{{ pe_ver }}-{{ pe_arch }}.tar.gz creates=/root/puppet-enterprise-{{ pe_ver }}-{{ pe_arch }}
+
+- name: Copy the answer file
+  copy: src=master.txt dest=/root/master.txt
+
+- name: Install PE with answer file
+  command: /root/puppet-enterprise-{{ pe_ver }}-{{ pe_arch }}/puppet-enterprise-installer -a /root/master.txt creates=/etc/puppetlabs/puppet/puppet.conf
+  register: result
+  ignore_errors: True
+  
+- name: Notification of failure
+  fail: msg="PE install failed somewhere. Please try again."
+  when: result|failed
+
+- name: Autosign for vagrant
+  copy: src=autosign.conf dest=/etc/puppetlabs/puppet/autosign.conf
+  notify:
+    - restart puppetserver
+
+- name: Run puppet agent -t on the master
+  command: puppet agent -t

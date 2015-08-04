@@ -1,0 +1,5 @@
+- hosts: puppetmaster
+- hosts: agent
+  roles:
+    - { role: common }
+    - { role: puppetagent }

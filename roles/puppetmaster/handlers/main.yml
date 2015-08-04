@@ -1,0 +1,2 @@
+- name: restart puppetserver
+  service: name=pe-puppetserver state=restarted
